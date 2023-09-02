@@ -9,6 +9,11 @@ class Initial_State():
         self.device = device
 
     def rho_reshape(self, rho):
+        
+        test = rho.detach().cpu().numpy()
+        if np.round(np.trace(test), 3) != 1:
+            raise Exception('rho is not a valid density matrix')
+                 
         rho = rho.reshape(1, 1, self.D**self.N, self.D**self.N)
         return rho
     
@@ -20,6 +25,7 @@ class Initial_State():
 
         psi/= torch.norm(psi)
         rho = torch.matmul(psi, psi.t().conj())
+
 
         return self.rho_reshape(rho)
     
