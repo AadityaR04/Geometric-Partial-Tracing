@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+import os
 import json
 
 class Plotter():
@@ -19,12 +20,20 @@ class Plotter():
             plt.plot(label, time_result[index], marker = 'o')
             plt.xticks(label)
             plt.legend(D_list)
-            # plt.scatter(label, time_result[index])
             plt.xlabel("No of Qubits traced")
             plt.ylabel("time")
             plt.title("N = " + str(N))
+
+        newpath = r'./Plots' 
+        if not os.path.exists(newpath):
+            os.makedirs(newpath)
         
-        plt.show()
+        plt.savefig("./Plots/N_" + str(N) + ".png", bbox_inches='tight')
+
+        plt.tight_layout()
 
 D_list = list(range(2, 5))
-Plotter().plotter(D_list, 5)
+N_list = list(range(2, 19))
+
+for N in N_list:
+    Plotter().plotter(D_list, N)
