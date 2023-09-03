@@ -1,5 +1,6 @@
 import os
 import json
+import datetime
 from InitialState import Initial_State
 from QuditPartialTrace import Convolutional_Partial_Trace
 
@@ -23,10 +24,19 @@ class Time_Result():
 
     def time_result(self):
 
+        print("\nPartial Tracing Time Results")
+        print("--------------------------------------------")
+        print("Time of starting the program: ", datetime.datetime.now())
+        print("--------------------------------------------")
+
         for No_Qudits in self.Qudit_list:
             time_result = []
-            for D_level in self.D_list:
 
+            print("\nStarting for Qudit No: ", No_Qudits)
+            print("--------------------------------------------")
+            for D_level in self.D_list:
+                
+                print("\nD level: ", D_level)
                 state = Initial_State(d_level = D_level, No_qudits = No_Qudits, device = self.device)
                 rho = state.real_random()
 
@@ -38,9 +48,14 @@ class Time_Result():
                     reduced_rho, time = Partial_Trace.partial_trace()
                     t.append(time)
                     label.append(No_Qudits - q)
+                    print("\t No of Qudits traced: ", No_Qudits - q)
+                    print("\t Time taken: ", time)
+                    print("\n")
                 
                 time_result.append(t)
-            
+
+            print("--------------------------------------------")
+
             label_result = [time_result, label]
 
             self.result(label_result, No_Qudits)

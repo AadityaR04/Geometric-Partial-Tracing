@@ -28,9 +28,8 @@ class Plotter():
         if not os.path.exists(newpath):
             os.makedirs(newpath)
         
-        plt.savefig("./Plots/N_" + str(N) + ".png", bbox_inches='tight')
-
-        plt.tight_layout()
+        plt.savefig("./Plots/N_" + str(N) + ".png")
+        plt.clf()
 
 D_list = list(range(2, 5))
 N_list = list(range(2, 19))

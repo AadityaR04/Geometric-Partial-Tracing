@@ -1,6 +1,5 @@
 import torch
 from utils import Time_Result
-from Plotter import Plotter
 
 #Defining the device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
