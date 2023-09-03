@@ -26,6 +26,8 @@ class Time_Result():
 
         print("\nPartial Tracing Time Results")
         print("--------------------------------------------")
+        print("Device: ", self.device)
+        print("--------------------------------------------")
         print("Time of starting the program: ", datetime.datetime.now())
         print("--------------------------------------------")
 
