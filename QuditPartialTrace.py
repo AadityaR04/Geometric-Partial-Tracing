@@ -22,6 +22,9 @@ class Convolutional_Partial_Trace:
         # If M = 0, then the partial trace is just the trace
         reduced_block = self.rho
         block_dim = self.D ** (self.N + 1)
+
+        del self.rho
+        torch.cuda.empty_cache()
         
         for i in range(self.M):
             if i == 0:
@@ -60,7 +63,7 @@ class Convolutional_Partial_Trace:
         dimension = block_dim//self.D
 
         # Kernel is an identity matrix repeated across all the channels
-        kernel = torch.eye(dimension, dtype = torch.cfloat).repeat(1, channels, 1, 1).to(self.device)
+        kernel = torch.eye(dimension, dtype = torch.float).repeat(1, channels, 1, 1).to(self.device)
         # Performing the trace
         output_tensor = F.conv2d(tensor, kernel, stride = dimension, padding = 0)
         
