@@ -31,8 +31,8 @@ class Plotter():
         plt.savefig("./Plots/N_" + str(N) + ".png")
         plt.clf()
 
-D_list = list(range(2, 5))
-N_list = list(range(2, 19))
+D_list = [2]
+N_list = list(range(2, 20))
 
 for N in N_list:
     Plotter().plotter(D_list, N)
