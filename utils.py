@@ -47,7 +47,7 @@ class Time_Result():
                 for q in range(1, No_Qudits):
                     Q.append(q)
                     Partial_Trace = Convolutional_Partial_Trace(input = rho, d_level = D_level, qudits = Q, device = self.device)
-                    reduced_rho, time = Partial_Trace.partial_trace()
+                    _, time = Partial_Trace.partial_trace()
                     t.append(time)
                     label.append(No_Qudits - q)
                     print("\t No of Qudits traced: ", No_Qudits - q)
