@@ -18,7 +18,7 @@ class Initial_State():
         return rho
     
     def real_custom(self, Q_):
-        psi = torch.zeros((self.D**self.N, 1), device = self.device)
+        psi = torch.zeros((self.D**self.N, 1), device = self.device, dtype= torch.float)
 
         for qudit in Q_:
             psi[qudit] = 1
@@ -31,14 +31,14 @@ class Initial_State():
     
     def real_random(self):
         G = np.random.normal(0, 1, size = (self.D**self.N, self.D**self.N))
-        G = torch.tensor(G, device = self.device)
+        G = torch.tensor(G, device = self.device, dtype= torch.float)
         rho = torch.matmul(G, G.t().conj())/torch.trace(torch.matmul(G, G.t().conj()))
 
         return self.rho_reshape(rho)
     
     def nGHZ(self):
         assert self.N >= 3, "Total number of spins should be greater than or equal to 3"
-        psi = torch.zeros((self.D**self.N, 1), device = self.device)
+        psi = torch.zeros((self.D**self.N, 1), device = self.device, dtype= torch.float)
         # Constructing the GHZ state
         psi[0] = 1
         psi[-1] = 1
@@ -49,7 +49,7 @@ class Initial_State():
     
     def nW(self):
         assert self.N >= 3, "Total number of spins should be greater than or equal to 3"
-        psi = torch.zeros((self.D**self.N, 1), device = self.device)
+        psi = torch.zeros((self.D**self.N, 1), device = self.device, dtype= torch.float)
         # Constructing the W state
         psi[0] = 1
         for i in range(1, self.N):

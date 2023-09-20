@@ -3,6 +3,7 @@ import json
 import datetime
 from InitialState import Initial_State
 from QuditPartialTrace import Convolutional_Partial_Trace
+import torch
 
 class Time_Result():
 
@@ -40,7 +41,8 @@ class Time_Result():
                 
                 print("\nD level: ", D_level)
                 state = Initial_State(d_level = D_level, No_qudits = No_Qudits, device = self.device)
-                rho = state.real_random()
+                rho = state.nW()
+                # rho = state.real_random()
 
                 Q, t, label = [], [], []
                 
@@ -48,6 +50,11 @@ class Time_Result():
                     Q.append(q)
                     Partial_Trace = Convolutional_Partial_Trace(input = rho, d_level = D_level, qudits = Q, device = self.device)
                     _, time = Partial_Trace.partial_trace()
+
+                    del _
+                    del Partial_Trace
+                    torch.cuda.empty_cache()
+                    
                     t.append(time)
                     label.append(No_Qudits - q)
                     print("\t No of Qudits traced: ", No_Qudits - q)
@@ -55,6 +62,10 @@ class Time_Result():
                     print("\n")
                 
                 time_result.append(t)
+                
+                del rho
+                del state
+                torch.cuda.empty_cache()
 
             print("--------------------------------------------")
 

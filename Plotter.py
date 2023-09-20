@@ -32,7 +32,7 @@ class Plotter():
         plt.clf()
 
 D_list = [2]
-N_list = list(range(2, 20))
+N_list = list(range(3, 20))
 
 for N in N_list:
     Plotter().plotter(D_list, N)

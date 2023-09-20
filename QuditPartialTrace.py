@@ -12,6 +12,8 @@ class Convolutional_Partial_Trace:
         self.dim_D = self.D**2
         self.device = device
 
+        del input
+
     def log_n_x(self, x, base):
         self.N = int(torch.log(torch.tensor(x.shape[2], device = self.device))/torch.log(torch.tensor(base, device = self.device)))
 
@@ -55,6 +57,9 @@ class Convolutional_Partial_Trace:
                 reduced_block = torch.stack(row_split, dim = 0).reshape(-1, channels, block_dim//self.D, block_dim//self.D)
                 
                 temp = reduced_block
+            
+        del temp
+        torch.cuda.empty_cache()
 
         return reduced_block, channels, block_dim
 
@@ -67,16 +72,25 @@ class Convolutional_Partial_Trace:
         # Performing the trace
         output_tensor = F.conv2d(tensor, kernel, stride = dimension, padding = 0)
         
+        del tensor
+        del kernel
+        torch.cuda.empty_cache()
+
         return output_tensor
     
 
     def matrix_reassembly(self, reduced_tensor):
         tensor = reduced_tensor.squeeze()
+        del reduced_tensor
+        torch.cuda.empty_cache()
 
         for i in range(1, self.M):
             pow = i
             block = torch.chunk(tensor, self.dim_D, dim = 0)
             tensor = torch.stack(block, dim = 1).reshape(-1, self.D, self.D, self.D**(pow), self.D**(pow)).transpose(3, 2).reshape(-1, self.D**(pow+1), self.D**(pow+1))
+            
+            del block
+            torch.cuda.empty_cache()
 
         return tensor.squeeze()
     
@@ -87,10 +101,10 @@ class Convolutional_Partial_Trace:
 
         reduced_tensor, channels, block_dim = self.block_splitting()
         reduced_tensor = self.conv_partial_trace(reduced_tensor, channels, block_dim)
-        output_tensor = self.matrix_reassembly(reduced_tensor)
+        reduced_tensor = self.matrix_reassembly(reduced_tensor)
 
         t2 = time.time()
 
         total_time = t2-t1
 
-        return output_tensor, total_time
+        return reduced_tensor, total_time
