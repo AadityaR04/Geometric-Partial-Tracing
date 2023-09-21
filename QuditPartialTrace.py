@@ -1,5 +1,6 @@
 import torch
 import torch.nn.functional as F
+import torch.distributed as dist
 import time
 
 class Convolutional_Partial_Trace:
@@ -15,17 +16,17 @@ class Convolutional_Partial_Trace:
         del input
 
     def log_n_x(self, x, base):
-        self.N = int(torch.log(torch.tensor(x.shape[2], device = self.device))/torch.log(torch.tensor(base, device = self.device)))
+        self.N = int(torch.log(torch.tensor(x.shape[2], device = self.device[1]))/torch.log(torch.tensor(base, device = self.device[1])))
 
     def block_splitting(self):
-        temp = self.rho
+        temp = self.rho.to(self.device[1])
+        del self.rho
         channels = 1 # Number of channels in the kernel
 
         # If M = 0, then the partial trace is just the trace
-        reduced_block = self.rho
+        reduced_block = self.rho.to(self.device[0])
         block_dim = self.D ** (self.N + 1)
 
-        del self.rho
         torch.cuda.empty_cache()
         
         for i in range(self.M):
@@ -41,24 +42,25 @@ class Convolutional_Partial_Trace:
             channels *= No_of_blocks
 
             # For j = 0
-            reduced_block = temp[:,:,0*block_dim:(0+1)*block_dim, 0*block_dim:(0+1)*block_dim]
+            reduced_block = temp[:,:,0*block_dim:(0+1)*block_dim, 0*block_dim:(0+1)*block_dim].to(self.device[0])
 
             for j in range(1, No_of_blocks):
                 # Divide into blocks
-                block = temp[:,:,j*block_dim:(j+1)*block_dim, j*block_dim:(j+1)*block_dim]
+                block = temp[:,:,j*block_dim:(j+1)*block_dim, j*block_dim:(j+1)*block_dim].to(self.device[1])
                 # Concatenate the blocks into channels
-                reduced_block = torch.cat((reduced_block, block), dim = 1)
+                reduced_block = torch.cat((reduced_block, block), dim = 1).to(self.device[0])
 
             if i != self.M-1:
                 # Split into groups of dim
-                column_split = torch.chunk(reduced_block, self.D, dim = 3)
-                column = torch.stack(column_split, dim = 0).reshape(-1, channels, block_dim, block_dim//self.D)
-                row_split = torch.chunk(column, self.D, dim = 2)
-                reduced_block = torch.stack(row_split, dim = 0).reshape(-1, channels, block_dim//self.D, block_dim//self.D)
+                column_split = torch.chunk(reduced_block, self.D, dim = 3).to(self.device[1])
+                column = torch.stack(column_split, dim = 0).reshape(-1, channels, block_dim, block_dim//self.D).to(self.device[1])
+                row_split = torch.chunk(column, self.D, dim = 2).to(self.device[1])
+                reduced_block = torch.stack(row_split, dim = 0).reshape(-1, channels, block_dim//self.D, block_dim//self.D).to(self.device[0])
                 
-                temp = reduced_block
+                temp = reduced_block.to(self.device[1])
             
         del temp
+        del column_split, column, row_split
         torch.cuda.empty_cache()
 
         return reduced_block, channels, block_dim
@@ -68,9 +70,9 @@ class Convolutional_Partial_Trace:
         dimension = block_dim//self.D
 
         # Kernel is an identity matrix repeated across all the channels
-        kernel = torch.eye(dimension, dtype = torch.float).repeat(1, channels, 1, 1).to(self.device)
+        kernel = torch.eye(dimension, dtype = torch.float).repeat(1, channels, 1, 1).to(self.device[1])
         # Performing the trace
-        output_tensor = F.conv2d(tensor, kernel, stride = dimension, padding = 0)
+        output_tensor = F.conv2d(tensor, kernel, stride = dimension, padding = 0).to(self.device[0])
         
         del tensor
         del kernel
@@ -100,8 +102,11 @@ class Convolutional_Partial_Trace:
         t1 = time.time()
 
         reduced_tensor, channels, block_dim = self.block_splitting()
+        dist.barrier()
         reduced_tensor = self.conv_partial_trace(reduced_tensor, channels, block_dim)
+        dist.barrier()
         reduced_tensor = self.matrix_reassembly(reduced_tensor)
+        dist.barrier()
 
         t2 = time.time()
 

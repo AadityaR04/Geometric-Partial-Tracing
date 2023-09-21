@@ -4,7 +4,7 @@ from utils import Time_Result
 # from QuditPartialTrace import Convolutional_Partial_Trace
 
 #Defining the device
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = [torch.device("cuda:0" if torch.cuda.is_available() else "cpu"), torch.device("cuda:1" if torch.cuda.is_available() else "cpu")]
 # device = torch.device("cpu")
 
 # Define the number of qudits and the dimension of the Hilbert space
