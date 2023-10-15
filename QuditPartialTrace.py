@@ -24,7 +24,7 @@ class Convolutional_Partial_Trace:
         channels = 1 # Number of channels in the kernel
 
         # If M = 0, then the partial trace is just the trace
-        reduced_block = self.rho.to(self.device[0])
+        reduced_block = temp.to(self.device[0])
         block_dim = self.D ** (self.N + 1)
 
         torch.cuda.empty_cache()
@@ -52,15 +52,16 @@ class Convolutional_Partial_Trace:
 
             if i != self.M-1:
                 # Split into groups of dim
-                column_split = torch.chunk(reduced_block, self.D, dim = 3).to(self.device[1])
+                column_split = torch.chunk(reduced_block, self.D, dim = 3)
                 column = torch.stack(column_split, dim = 0).reshape(-1, channels, block_dim, block_dim//self.D).to(self.device[1])
-                row_split = torch.chunk(column, self.D, dim = 2).to(self.device[1])
+                row_split = torch.chunk(column, self.D, dim = 2)
                 reduced_block = torch.stack(row_split, dim = 0).reshape(-1, channels, block_dim//self.D, block_dim//self.D).to(self.device[0])
                 
                 temp = reduced_block.to(self.device[1])
+                del column_split, column, row_split
             
         del temp
-        del column_split, column, row_split
+        
         torch.cuda.empty_cache()
 
         return reduced_block, channels, block_dim
@@ -70,7 +71,7 @@ class Convolutional_Partial_Trace:
         dimension = block_dim//self.D
 
         # Kernel is an identity matrix repeated across all the channels
-        kernel = torch.eye(dimension, dtype = torch.float).repeat(1, channels, 1, 1).to(self.device[1])
+        kernel = torch.eye(dimension, dtype = torch.float).repeat(1, channels, 1, 1).to(self.device[0])
         # Performing the trace
         output_tensor = F.conv2d(tensor, kernel, stride = dimension, padding = 0).to(self.device[0])
         
@@ -102,11 +103,11 @@ class Convolutional_Partial_Trace:
         t1 = time.time()
 
         reduced_tensor, channels, block_dim = self.block_splitting()
-        dist.barrier()
+        # dist.barrier()
         reduced_tensor = self.conv_partial_trace(reduced_tensor, channels, block_dim)
-        dist.barrier()
+        # dist.barrier()
         reduced_tensor = self.matrix_reassembly(reduced_tensor)
-        dist.barrier()
+        # dist.barrier()
 
         t2 = time.time()
 

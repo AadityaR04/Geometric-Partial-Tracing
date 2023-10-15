@@ -13,7 +13,7 @@ class Initial_State():
         test = rho.detach().cpu().numpy()
         if np.round(np.trace(test), 3) != 1:
             raise Exception('rho is not a valid density matrix')
-                 
+        
         rho = rho.reshape(1, 1, self.D**self.N, self.D**self.N)
         return rho
     
