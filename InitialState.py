@@ -49,7 +49,7 @@ class Initial_State():
     
     def nW(self):
         assert self.N >= 3, "Total number of spins should be greater than or equal to 3"
-        psi = torch.zeros((self.D**self.N, 1), device = self.device, dtype= torch.float)
+        psi = torch.zeros((self.D**self.N, 1), dtype= torch.float)
         # Constructing the W state
         psi[0] = 1
         for i in range(1, self.N):
