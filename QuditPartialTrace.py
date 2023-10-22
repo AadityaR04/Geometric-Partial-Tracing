@@ -4,6 +4,16 @@ from torch.utils.data import Dataset, DataLoader
 
 
 class Block_Split_Loader(Dataset):
+    '''
+    Loads the block splitted tensor into a DataLoader object
+    
+    Parameters:
+        reduced_block: block splitted tensor
+        
+    Returns:
+        None
+    '''
+    
     def __init__(self, reduced_block):
         self.len = reduced_block.shape[0]
         self.reduced_block = reduced_block
@@ -16,6 +26,15 @@ class Block_Split_Loader(Dataset):
 
 
 class Convolutional_Partial_Trace(nn.Module):
+    '''
+    Class to perform the partial trace operation on a density matrix using 3D convolution
+    
+    Parameters:
+        input: input density matrix
+        d_level: D level of the system
+        qudits: list of qudits to be traced out
+        device: device(s) on which the operation is performed
+    '''
     
     def __init__(self, input, d_level, qudits, device):
         super(Convolutional_Partial_Trace, self).__init__()
@@ -32,14 +51,39 @@ class Convolutional_Partial_Trace(nn.Module):
         self.block_splitting()
         self.kernel_matrix()
         
+        '''
+        The 3D convolution is performed using the nn.Conv2d module of PyTorch. The gradients are turned off as it is a fixed kernel.
+        '''
+        
         self.pt = nn.Conv2d(in_channels=self.channels, out_channels=1, kernel_size=self.dimension, stride = self.dimension, padding = 0, bias=False)
         with torch.no_grad():
-            self.pt.weight = nn.Parameter(self.kernel)
+            self.pt.weight = nn.Parameter(self.kernel, requires_grad=False)
             
     def log_n_x(self, x, base):
+        '''
+        Returns the log of x in base
+        
+        Parameters:
+            x: input tensor
+            base: base of the log
+            
+        Returns:
+            log of x in base
+        '''
+        
         self.N = int(torch.log(torch.tensor(x.shape[2]))/torch.log(torch.tensor(base)))
 
     def block_splitting(self):
+        '''
+        Splits the tensor into blocks arranged in channels and batches according to the number of qudits traced out and loads it into a DataLoader object
+        
+        Parameters:
+            None
+            
+        Returns:
+            None        
+        '''
+        
         temp = self.rho
         self.channels = 1 # Number of channels in the kernel
 
@@ -87,10 +131,29 @@ class Convolutional_Partial_Trace(nn.Module):
         return block_loader
 
     def kernel_matrix(self):
+        '''
+        Creates the kernel matrix for convolution
+        
+        Parameters:
+            None
+            
+        Returns:
+            None
+        '''
+        
         self.dimension = self.block_dim//self.D
         self.kernel = torch.eye(self.dimension, dtype = torch.float).repeat(1, self.channels, 1, 1)
     
     def forward(self, input):
+        '''
+        Performs the 3D convolution on the block splitted tensor
+        
+        Parameters:
+            input: block splitted tensor
+            
+        Returns:
+            output: output of the convolution which is the block splitted resultant tensor obtained after partial trace
+        '''
         
         del self.rho
         torch.cuda.empty_cache()
@@ -101,6 +164,19 @@ class Convolutional_Partial_Trace(nn.Module):
 
 
 def trace(loader, output, device, Partial_Trace):
+    '''
+    Performs the partial trace operation on the input tensor
+    
+    Parameters:
+        loader: DataLoader object containing the block splitted tensor
+        output: list to store the output of the partial trace operation
+        device: device(s) on which the operation is performed
+        Partial_Trace: Partial_Trace object
+        
+    Returns:
+        reduced_tensor: output of the partial trace operation in block splitted form
+    '''
+    
     for batch in loader:
         batch = batch.to(device)
         out = Partial_Trace(batch)
@@ -112,6 +188,17 @@ def trace(loader, output, device, Partial_Trace):
 
 
 def Matrix_Maker(input, D, Q):
+    '''
+    Reassembles the block splitted tensor into a density matrix which is the final output of the partial trace operation
+    
+    Parameters:
+        input: block splitted tensor
+        D: D level of the system
+        Q: list of qudits to be traced out
+        
+    Returns:
+        tensor: final density tensor after partial trace
+    '''
     
     tensor = input.squeeze()
     del input

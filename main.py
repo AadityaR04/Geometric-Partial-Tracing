@@ -13,11 +13,11 @@ To calculate the time taken for partial trace of a density matrix, we need to de
 The following code snippet will calculate the time taken for partial trace of a density matrix for different number of qudits and different D levels.
 '''
 
-# # Define the number of qudits and the dimension of the Hilbert space
-# D_list = [2]
-# Qudit_list = list(range(3, 20))
+# Define the number of qudits and the dimension of the Hilbert space
+D_list = [2]
+Qudit_list = list(range(3, 20))
 
-# Time_Result(Q_list = Qudit_list, Level_list = D_list, device = device).time_result()
+Time_Result(Q_list = Qudit_list, Level_list = D_list, device = device).time_result()
 
 '''
 To calculate the partial trace of a density matrix, we need to define the following:
@@ -30,15 +30,15 @@ For custom density matrices, q is the position and value of the non-zero element
 The following code snippet will calculate the partial trace of a density matrix for a given D level and qudits to be traced out.
 '''
 
-D = 2
-q = [(1, 1), (2, 1), (8, 1), (16, 1)]
+# D = 2
+# q = [(1, 1), (2, 1), (8, 1), (16, 1)]
 
-rho = Initial_State(d_level= 2, No_qudits= 5, device= device).real_custom(q)
+# rho = Initial_State(d_level= 2, No_qudits= 5, device= device).real_custom(q)
 
-# print(rho)
-# print("------------------")
+# # print(rho)
+# # print("------------------")
 
-Q = [2]
+# Q = [2]
 
-Traced_Result = Output_Result(input= rho, D_level = D, Qudits = Q, device = device)
-Traced_Result.output()
+# Traced_Result = Output_Result(input= rho, D_level = D, Qudits = Q, device = device)
+# Traced_Result.output()

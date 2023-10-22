@@ -3,6 +3,17 @@ import os
 import json
 
 def plotter(D_list, N):
+    '''
+    Plots the time taken for partial trace of a density matrix for different D levels and different number of qudits traced out.
+    The results are stored in a json file.
+    
+    Parameters:
+        D_list: list of D levels
+        N: number of qudits traced out
+        
+    Returns:
+        None
+    '''
 
     file_name = "./Time_Results/N_" + str(N) + ".json"
     with open(file_name, 'r') as f:
