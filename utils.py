@@ -34,8 +34,8 @@ class Time_Result():
         print("No of Devices: ", torch.cuda.device_count())
         print("--------------------------------------------")
         
+        print("Devices: ")
         if torch.cuda.device_count() > 1:
-            print("Devices: ")
             for i in range(torch.cuda.device_count()):
                 print("Device No " + str(i) + ":", end = " ")
                 print(torch.cuda.get_device_name(i), end = " ")
@@ -145,8 +145,8 @@ class Output_Result():
         print("No of Devices: ", torch.cuda.device_count())
         print("--------------------------------------------")
         
+        print("Devices: ")
         if torch.cuda.device_count() > 1:
-            print("Devices: ")
             for i in range(torch.cuda.device_count()):
                 print("Device No " + str(i) + ":", end = " ")
                 print(torch.cuda.get_device_name(i), end = " ")
