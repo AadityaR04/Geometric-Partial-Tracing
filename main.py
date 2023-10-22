@@ -1,30 +1,44 @@
 import torch
-from utils import Time_Result
+from utils import Time_Result, Output_Result
 from InitialState import Initial_State
-# from QuditPartialTrace import Convolutional_Partial_Trace
 
 # #Defining the device
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# Define the number of qudits and the dimension of the Hilbert space
-Qudit_list = list(range(3, 20))
-D_list = [2]
+'''
+To calculate the time taken for partial trace of a density matrix, we need to define the following:
+    1. The D level of the system (D_list)
+    2. The number of qudits in the system (Qudit_list)
 
-Time_Result(Q_list = Qudit_list, Level_list = D_list, device = device).time_result()
+The following code snippet will calculate the time taken for partial trace of a density matrix for different number of qudits and different D levels.
+'''
 
-# Q_ = [1, 2, 8, 16]
+# # Define the number of qudits and the dimension of the Hilbert space
+# D_list = [2]
+# Qudit_list = list(range(3, 20))
 
-# rho = Initial_State(d_level= 2, No_qudits= 5, device= device).real_custom(Q_)
+# Time_Result(Q_list = Qudit_list, Level_list = D_list, device = device).time_result()
+
+'''
+To calculate the partial trace of a density matrix, we need to define the following:
+    1. The D level of the system (D)
+    2. The qudits to be traced out (Q)
+
+The input density matrix is defined in InitialState.py
+For custom density matrices, q is the position and value of the non-zero elements in the density matrix.
+
+The following code snippet will calculate the partial trace of a density matrix for a given D level and qudits to be traced out.
+'''
+
+D = 2
+q = [(1, 1), (2, 1), (8, 1), (16, 1)]
+
+rho = Initial_State(d_level= 2, No_qudits= 5, device= device).real_custom(q)
 
 # print(rho)
 # print("------------------")
 
-# Q = [2, 3, 4, 5]
+Q = [2]
 
-# Partial_Trace = Convolutional_Partial_Trace(input = rho, d_level = 2, qudits = Q, device = device)
-# out, time = Partial_Trace.partial_trace()
-
-# out = out.detach().cpu().numpy()
-# import numpy as np
-# print("\n")
-# print(np.round(out, 1 ))
+Traced_Result = Output_Result(input= rho, D_level = D, Qudits = Q, device = device)
+Traced_Result.output()
