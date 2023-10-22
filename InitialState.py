@@ -17,10 +17,10 @@ class Initial_State():
         rho = rho.reshape(1, 1, self.D**self.N, self.D**self.N)
         return rho
     
-    def real_custom(self, Q_):
+    def real_custom(self, q):
         psi = torch.zeros((self.D**self.N, 1), dtype= torch.float)
 
-        for qudit, value in Q_:
+        for qudit, value in q:
             psi[qudit] = value
 
         psi/= torch.norm(psi)
