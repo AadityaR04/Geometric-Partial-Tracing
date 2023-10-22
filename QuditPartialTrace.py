@@ -85,12 +85,10 @@ class Convolutional_Partial_Trace(nn.Module):
         del reduced_block
         
         return block_loader
-        
 
     def kernel_matrix(self):
         self.dimension = self.block_dim//self.D
         self.kernel = torch.eye(self.dimension, dtype = torch.float).repeat(1, self.channels, 1, 1)
-
     
     def forward(self, input):
         
@@ -101,21 +99,32 @@ class Convolutional_Partial_Trace(nn.Module):
         # print("\tIn Model: input size", input.size(), "output size", output.size())
         return output
 
-    
 
-class Matrix_Maker(Convolutional_Partial_Trace):
+def trace(loader, output, device, Partial_Trace):
+    for batch in loader:
+        batch = batch.to(device)
+        out = Partial_Trace(batch)
+        output.append(out)
     
-    def matrix_reassembly(self, reduced_tensor):
-        tensor = reduced_tensor.squeeze()
-        del reduced_tensor
+    reduced_tensor = torch.cat(output, dim = 0)
+    
+    return reduced_tensor
+
+
+def Matrix_Maker(input, D, Q):
+    
+    tensor = input.squeeze()
+    del input
+    torch.cuda.empty_cache()
+    
+    M = len(Q)
+    
+    for i in range(1, M):
+        pow = i
+        block = torch.chunk(tensor, D**2, dim = 0)
+        tensor = torch.stack(block, dim = 1).reshape(-1, D, D, D**(pow), D**(pow)).transpose(3, 2).reshape(-1, D**(pow+1), D**(pow+1))
+        
+        del block
         torch.cuda.empty_cache()
-
-        for i in range(1, self.M):
-            pow = i
-            block = torch.chunk(tensor, self.dim_D, dim = 0)
-            tensor = torch.stack(block, dim = 1).reshape(-1, self.D, self.D, self.D**(pow), self.D**(pow)).transpose(3, 2).reshape(-1, self.D**(pow+1), self.D**(pow+1))
-            
-            del block
-            torch.cuda.empty_cache()
-
-        return tensor.squeeze()
+        
+    return tensor.squeeze()
