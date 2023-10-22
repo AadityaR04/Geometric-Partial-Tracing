@@ -56,6 +56,8 @@ class Initial_State():
 
         psi/= torch.norm(psi)
         rho = torch.matmul(psi, psi.t().conj())
+        del psi
+        torch.cuda.empty_cache()
 
         return self.rho_reshape(rho)
     
@@ -73,6 +75,8 @@ class Initial_State():
         G = np.random.normal(0, 1, size = (self.D**self.N, self.D**self.N))
         G = torch.tensor(G, dtype= torch.float, requires_grad=False)
         rho = torch.matmul(G, G.t().conj())/torch.trace(torch.matmul(G, G.t().conj()))
+        del G
+        torch.cuda.empty_cache()
 
         return self.rho_reshape(rho)
     
@@ -94,6 +98,8 @@ class Initial_State():
         psi[-1] = 1
         psi/= torch.norm( psi)
         rho = torch.matmul(psi, psi.t().conj())
+        del psi
+        torch.cuda.empty_cache()
 
         return self.rho_reshape(rho)
     
@@ -116,6 +122,8 @@ class Initial_State():
             psi[self.D**i] = 1
         psi/= torch.norm(psi)
         rho = torch.matmul(psi, psi.t().conj())
+        del psi
+        torch.cuda.empty_cache()
 
         return self.rho_reshape(rho)
 

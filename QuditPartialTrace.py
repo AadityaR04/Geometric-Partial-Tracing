@@ -85,6 +85,7 @@ class Convolutional_Partial_Trace(nn.Module):
         '''
         
         temp = self.rho
+        
         self.channels = 1 # Number of channels in the kernel
 
         # If M = 0, then the partial trace is just the trace
@@ -112,6 +113,9 @@ class Convolutional_Partial_Trace(nn.Module):
                 # Concatenate the blocks into channels
                 reduced_block = torch.cat((reduced_block, block), dim = 1)
 
+                del block
+                torch.cuda.empty_cache()
+            
             if i != self.M-1:
                 # Split into groups of dim
                 column_split = torch.chunk(reduced_block, self.D, dim = 3)
@@ -127,6 +131,7 @@ class Convolutional_Partial_Trace(nn.Module):
         
         block_loader = DataLoader(dataset= Block_Split_Loader(reduced_block), batch_size = reduced_block.shape[0], shuffle = False) 
         del reduced_block
+        torch.cuda.empty_cache()
         
         return block_loader
 
@@ -159,6 +164,8 @@ class Convolutional_Partial_Trace(nn.Module):
         torch.cuda.empty_cache()
 
         output = self.pt(input)
+        del self.kernel
+        torch.cuda.empty_cache()
         # print("\tIn Model: input size", input.size(), "output size", output.size())
         return output
 
@@ -181,9 +188,15 @@ def trace(loader, output, device, Partial_Trace):
         batch = batch.to(device)
         out = Partial_Trace(batch)
         output.append(out)
+        
+        del batch
+        del out
+        torch.cuda.empty_cache()
     
     reduced_tensor = torch.cat(output, dim = 0)
     
+    del output, loader
+    torch.cuda.empty_cache()
     return reduced_tensor
 
 

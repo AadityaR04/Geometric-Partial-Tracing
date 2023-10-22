@@ -10,17 +10,6 @@ import torch.nn as nn
 import numpy as np
 
 class Time_Result():
-    '''
-    Class to calculate the time taken for partial trace of a density matrix for different D levels and different number of qudits traced out.
-    
-    Parameters:
-        Q_list: list of number of qudits in the system
-        Level_list: list of D levels of the system
-        device: device(s) on which the operation is performed
-        
-    Returns:
-        None
-    '''
 
     def __init__(self, Q_list, Level_list, device):
         self.Qudit_list = Q_list
@@ -28,9 +17,6 @@ class Time_Result():
         self.device = device
 
     def result(self, label_result, N):
-        '''
-        Stores the time taken for partial trace of a density matrix for different D levels and different number of qudits traced out in a json file.
-        '''
 
         newpath = r'./Time_Results' 
         if not os.path.exists(newpath):
@@ -42,16 +28,6 @@ class Time_Result():
             json.dump(label_result, f, indent=2)
 
     def time_result(self):
-        '''
-        Calculates the time taken for partial trace of a density matrix for different D levels and different number of qudits traced out.
-        Displays the results on the terminal.
-        
-        Parameters:
-            None
-            
-        Returns:
-            None
-        '''
 
         print("\nPartial Tracing Time Results")
         print("--------------------------------------------")
@@ -134,18 +110,6 @@ class Time_Result():
             self.result(label_result, No_Qudits)
             
 class Output_Result():
-    '''
-    Class to calculate the partial trace of a density matrix for a given D level and qudits to be traced out.
-    
-    Parameters:
-        input: input density matrix
-        D_level: D level of the system
-        Qudits: list of qudits to be traced out
-        device: device(s) on which the operation is performed
-        
-    Returns:
-        None
-    '''
     
     def __init__(self, input, D_level, Qudits, device):
         self.rho = input
@@ -156,15 +120,6 @@ class Output_Result():
         del input
     
     def result(self, output):
-        '''
-        Stores the output of the partial trace operation in a text file.
-        
-        Parameters:
-            output: output of the partial trace operation
-            
-        Returns:
-            None
-        '''
 
         newpath = r'./PartialTrace_Results' 
         if not os.path.exists(newpath):
@@ -181,20 +136,13 @@ class Output_Result():
         
         label += "_D_" + str(self.D) + ".txt"
         
-        np.savetxt("./PartialTrace_Results/" + label, output, fmt = '%1.3f')        
+        np.savetxt("./PartialTrace_Results/" + label, output, fmt = '%1.3f')
+        
+        del output
+        torch.cuda.empty_cache()
     
     
     def print_result(self, output):
-        '''
-        Displays the output of the partial trace operation on the terminal.
-        
-        Parameters:
-            output: output of the partial trace operation
-            
-        Returns:
-            None
-        '''
-        
         print("\nPartial Tracing Results")
         print("--------------------------------------------")
         print("No of Devices: ", torch.cuda.device_count())
@@ -225,17 +173,10 @@ class Output_Result():
         
 
     def output(self):
-        '''
-        Calculates the partial trace of a density matrix for a given D level and qudits to be traced out.
-        
-        Parameters:
-            None
-            
-        Returns:
-            None
-        '''
-        
         Partial_Trace = Convolutional_Partial_Trace(input = self.rho, d_level = self.D, qudits = self.Q, device = self.device)
+        
+        del self.rho
+        torch.cuda.empty_cache()
         
         loader = Partial_Trace.block_splitting()
         
@@ -245,7 +186,14 @@ class Output_Result():
         
         output = []
         reduced_tensor = QPT.trace(loader, output, self.device, Partial_Trace)
+        
+        del loader, output, Partial_Trace
+        torch.cuda.empty_cache()
+        
         final_result = QPT.Matrix_Maker(input = reduced_tensor, D = self.D, Q = self.Q)
+        
+        del reduced_tensor
+        torch.cuda.empty_cache()
         
         self.result(final_result)
         self.print_result(final_result)
