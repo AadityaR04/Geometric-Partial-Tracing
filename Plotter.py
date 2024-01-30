@@ -26,9 +26,9 @@ def plotter(D_list, N):
 
     for index,_ in enumerate(D_list):
         
-        plt.plot(label, time_result[index], marker = 'o')
+        plt.plot(label, time_result[index], marker = 'o', label = "D = " + str(D_list[index]))
         plt.xticks(label)
-        plt.legend(D_list)
+        plt.legend()
         plt.xlabel("No of Qubits traced")
         plt.ylabel("time")
         plt.title("N = " + str(N))
@@ -40,8 +40,8 @@ def plotter(D_list, N):
     plt.savefig("./Plots/N_" + str(N) + ".png")
     plt.clf()
 
-D_list = [2]
-N_list = list(range(3, 20))
+D_list = [2, 3, 4, 5, 6]
+N_list = list(range(3, 16))
 
 for N in N_list:
     plotter(D_list, N)
