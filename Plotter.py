@@ -36,10 +36,10 @@ def plotter(D_list, N):
         plt.rcParams['legend.edgecolor'] = 'black'
 
 
-        plt.plot(label, time_result[index], marker = 'o', label = "D = " + str(D_list[index]), linewidth = 2.0)
+        plt.plot(label, time_result[index], marker = 'o', label = "D = " + str(D_list[index]), linewidth = 5.0, markersize = 15)
         plt.tick_params(axis='both', which='major', labelsize=30)
         plt.xticks(label)
-        plt.legend(fontsize=40)
+        plt.legend(fontsize=30)
         plt.xlabel("No of Qubits traced", fontsize=30)
         plt.ylabel("time", fontsize=30)
         plt.title("N = " + str(N), fontsize=40)
