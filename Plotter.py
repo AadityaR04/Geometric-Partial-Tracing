@@ -52,7 +52,7 @@ def plotter(D_list, N):
     plt.savefig("./Plots/N_" + str(N) + ".png")
     plt.clf()
 
-D_list = [2]
+D_list = [2, 3, 4, 5, 6]
 N_list = list(range(3, 16))
 
 for N in N_list:
