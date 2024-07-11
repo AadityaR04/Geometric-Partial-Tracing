@@ -5,7 +5,6 @@ Code for the algorithm to calculate the partial trace of a multi-qubit/qudit ($D
 ## Installation Instructions
 
 * Download the repository.
-* Copy the code folder to the working directory.
 * Create a conda environment with the necessary dependencies using the `environment.yaml` file provided in the repository using the command:
 
 ```bash
