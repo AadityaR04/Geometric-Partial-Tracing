@@ -1,0 +1,11 @@
+name: cpt
+channels:
+  - pytorch
+  - nvidia
+
+dependencies:
+  - python=3.9
+  - numpy
+  - matplotlib
+  - pytorch::pytorch
+  - nvidia::cudatoolkit=11.3
