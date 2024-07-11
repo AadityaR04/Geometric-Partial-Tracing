@@ -14,6 +14,12 @@ conda env create -f environment.yaml
 
 ## Usage
 
+* Activate the conda environment using the command:
+
+```bash
+conda activate cpt
+```
+
 * The `main.py` file contains the code to calculate the partial trace of a multi-qubit/qudit state geometrically using convolution. Sample code snippets are provided in the docstrings.
 
 ## Module List
