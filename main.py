@@ -1,3 +1,6 @@
+import sys
+sys.dont_write_bytecode = True
+
 import torch
 from utils import Time_Result, Output_Result
 from InitialState import Initial_State
