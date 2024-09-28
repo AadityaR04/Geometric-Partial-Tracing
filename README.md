@@ -1,6 +1,6 @@
 # Convolutional and computer vision methods for accelerating partial tracing operation in quantum mechanics for general qudit systems
 
-## - Aaditya Rudra $^{1*}$ and M. S. Ramkarthik $^2$
+## - Aaditya Rudra $^{1}$ and M. S. Ramkarthik $^{2*}$
 
 1* - Department of Electrical Engineering, Visvesvaraya National Institute of Technology, South Ambazari Road, Nagpur, 440010, Maharashtra, India. ([adityarudra02@gmail.com](mailto:adityarudra02@gmail.com))
 
