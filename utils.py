@@ -11,6 +11,7 @@ from QuditPartialTrace import Convolutional_Partial_Trace
 import torch
 import torch.nn as nn
 import numpy as np
+from scipy.optimize import curve_fit
 
 class Time_Result():
 
@@ -19,13 +20,13 @@ class Time_Result():
         self.D_list = Level_list
         self.device = device
 
-    def result(self, label_result, N):
+    def result(self, label_result, N, D):
 
-        newpath = r'./Time_Results' 
+        newpath = r'./Time_Results/D_' + str(D) + '/'
         if not os.path.exists(newpath):
             os.makedirs(newpath)
 
-        file_name = "./Time_Results/N_" + str(N) + ".json"
+        file_name = newpath + "N_" + str(N) + ".json"
 
         with open(file_name, 'w') as f:
             json.dump(label_result, f, indent=2)
@@ -106,12 +107,41 @@ class Time_Result():
                 del state
                 torch.cuda.empty_cache()
 
+                label_result = [time_result, label]
+                self.result(label_result, No_Qudits, D_level)
             print("--------------------------------------------")
 
-            label_result = [time_result, label]
-
-            self.result(label_result, No_Qudits)
             
+
+    def exp_decay(self, x, A, k, C):
+        return A * np.exp(-k * x) + C
+    
+    def uncertainty(self):
+        for No_Qudits in self.Qudit_list:
+            if No_Qudits <= 4:
+                continue
+
+            Uncertainty = []
+
+            for D_level in self.D_list:
+                filename = "./Time_Results/D_" + str(D_level) + "/N_" + str(No_Qudits) + ".json"
+                with open(filename, 'r') as f:
+                    data = json.load(f)
+                time_result = np.array(data[0][0])
+                label = np.array(data[1])
+
+                popt, _ = curve_fit(self.exp_decay, label, time_result, p0=(1, 0.1, 0), maxfev=10000, method='trf')
+                error = np.abs(time_result - self.exp_decay(label, *popt))
+                std_dev = np.sqrt(np.sum(error**2) / (len(error.tolist()) - len(popt)))
+
+                Uncertainty.append([np.round(std_dev, 4), error.tolist()])
+            error_filename = "./Uncertainty/D_" + str(D_level) + "/"
+            if not os.path.exists(error_filename):
+                os.makedirs(error_filename)
+            error_file = error_filename + "N_" + str(No_Qudits) + ".json"
+            with open(error_file, 'w') as f:
+                json.dump(Uncertainty, f)
+
 class Output_Result():
     
     def __init__(self, input, D_level, Qudits, device):
