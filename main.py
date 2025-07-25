@@ -13,14 +13,16 @@ To calculate the time taken for partial trace of a density matrix, we need to de
     1. The D level of the system (D_list)
     2. The number of qudits in the system (Qudit_list)
 
-The following code snippet will calculate the time taken for partial trace of a density matrix for different number of qudits and different D levels.
+The following code snippet will calculate the time taken for partial trace of a density matrix for different number of qudits and different D levels along with the uncertainty in the time taken.
 '''
 
 # Define the number of qudits and the dimension of the Hilbert space
-D_list = [2]
-Qudit_list = list(range(3, 20))
+D_list = [2, 3, 4, 5, 6]
+Qudit_list = list(range(3, 8))
 
-Time_Result(Q_list = Qudit_list, Level_list = D_list, device = device).time_result()
+TR = Time_Result(Q_list = Qudit_list, Level_list = D_list, device = device)
+TR.time_result()
+TR.uncertainty()
 
 '''
 To calculate the partial trace of a density matrix, we need to define the following:
