@@ -56,12 +56,12 @@ def plotter(D_list, N):
         plt.rcParams['legend.edgecolor'] = 'black'
 
         # plt.plot(label, time_result[index], marker = 'o', label = "D = " + str(D_list[index]), linewidth = 5.0, markersize = 15)
-        plt.errorbar(label, time_result[0], yerr=Errors[index], fmt='o-', label="D = " + str(D_list[index]) + r" ($\Delta t$ = " + str(Uncertainty[index]) + "s)", capsize=10, linewidth=1.5, markersize=8, elinewidth = 1.5, markeredgewidth=2)
-        plt.tick_params(axis='both', which='major', labelsize=22)
+        plt.errorbar(label, time_result[0], yerr=Errors[index], fmt='o-', label="D = " + str(D_list[index]) + r" ($\Delta t$ = " + str(Uncertainty[index][0]) + "s)", capsize=10, linewidth = 5, markersize=8, elinewidth = 5, markeredgewidth=5, ecolor='black')
+        plt.tick_params(axis='both', which='major', labelsize=28, width=3, length=10)
         plt.xticks(label)
         plt.legend(fontsize=30)
-        plt.xlabel("No of Qubits traced", fontsize=30)
-        plt.ylabel("time (in sec)", fontsize=30)
+        plt.xlabel("No of Qubits traced", fontsize=35, labelpad=10)
+        plt.ylabel("time (in sec)", fontsize=35, labelpad=10)
         plt.title("N = " + str(N), fontsize=40)
 
     newpath = r'./Plots' 
@@ -72,8 +72,8 @@ def plotter(D_list, N):
     plt.savefig("./Plots/D_" + str(D_list[-1]) + "_N_" + str(N) + ".png", bbox_inches='tight')
     plt.clf()
 
-D_list = [2, 3, 4, 5, 6]
-N_list = list(range(3, 7))
+D_list = [2, 3, 4, 5]
+N_list = list(range(5, 15))
 
 for N in N_list:
     plotter(D_list, N)
