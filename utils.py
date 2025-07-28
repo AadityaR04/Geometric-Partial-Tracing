@@ -14,6 +14,17 @@ import numpy as np
 from scipy.optimize import curve_fit
 
 class Time_Result():
+    '''
+    Class to compute the time taken for partial trace of a density matrix for different D-level, N particle systems.
+    The results are stored in a json file.
+    Parameters:
+        Q_list: list of number of qudits in the system
+        Level_list: list of D levels
+        device: device(s) on which the operation is performed
+
+    Returns:
+        None
+    '''
 
     def __init__(self, Q_list, Level_list, device):
         self.Qudit_list = Q_list
@@ -21,6 +32,16 @@ class Time_Result():
         self.device = device
 
     def result(self, label_result, N, D):
+        '''
+        Saves the time results in a json file.
+        Parameters:
+            label_result: list containing time results and labels
+            N: number of qudits traced out
+            D: D level of the system
+
+        Returns:
+            None
+        '''
 
         newpath = r'./Time_Results/D_' + str(D) + '/'
         if not os.path.exists(newpath):
@@ -32,6 +53,15 @@ class Time_Result():
             json.dump(label_result, f, indent=2)
 
     def time_result(self):
+        '''
+        Computes the time taken for partial trace of a density matrix for different D levels and different number of qudits traced out.
+        The results are stored in a json file.
+        Parameters:
+            None
+
+        Returns:
+            None
+        '''
 
         print("\nPartial Tracing Time Results")
         print("--------------------------------------------")
@@ -114,9 +144,29 @@ class Time_Result():
             
 
     def exp_decay(self, x, A, k, C):
+        '''
+        Exponential decay function for curve fitting.
+        Parameters:
+            x: independent variable (number of qubits traced)
+            A: amplitude
+            k: decay constant
+            C: offset
+
+        Returns:
+            None
+        '''
         return A * np.exp(-k * x) + C
     
     def uncertainty(self):
+        '''
+        Computes the uncertainty in the time taken for partial trace of a density matrix for different D levels and different number of qudits traced out.
+        The results are stored in a json file.
+        Parameters:
+            None
+
+        Returns:
+            None
+        '''
         for No_Qudits in self.Qudit_list:
             if No_Qudits <= 4:
                 continue
@@ -143,6 +193,19 @@ class Time_Result():
                 json.dump(Uncertainty, f)
 
 class Output_Result():
+    '''
+    Class to compute the output of the partial trace operation.
+    This class saves the output density matrix in a text file and prints the result.
+
+    Parameters:
+        input: input density matrix
+        D_level: D level of the system
+        Qudits: list of qudits to be traced out
+        device: device(s) on which the operation is performed
+
+    Returns:
+        None
+    '''
     
     def __init__(self, input, D_level, Qudits, device):
         self.rho = input
@@ -153,6 +216,15 @@ class Output_Result():
         del input
     
     def result(self, output):
+        '''
+        Saves the output density matrix to a text file.
+
+        Parameters:
+            output: output density matrix
+
+        Returns:
+            None
+        '''
 
         newpath = r'./PartialTrace_Results' 
         if not os.path.exists(newpath):
@@ -176,6 +248,15 @@ class Output_Result():
     
     
     def print_result(self, output):
+        '''
+        Prints the output density matrix and other information.
+        
+        Parameters:
+            output: output density matrix
+
+        Returns:
+            None
+        '''
         print("\nPartial Tracing Results")
         print("--------------------------------------------")
         print("No of Devices: ", torch.cuda.device_count())
@@ -206,6 +287,15 @@ class Output_Result():
         
 
     def output(self):
+        '''
+        Computes the output of the partial trace operation.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+        '''
         Partial_Trace = Convolutional_Partial_Trace(input = self.rho, d_level = self.D, qudits = self.Q, device = self.device)
         
         del self.rho
